@@ -1,0 +1,42 @@
+# Default rule pack for llm-sentinel stage 3 (rule_checks).
+# Each rule has an id, a category, and a regex applied to the normalized
+# prompt (case-insensitive unless the pattern says otherwise).
+
+injection_patterns:
+  - id: role_override
+    description: Attempts to override the assistant's role or instructions
+    pattern: '(ignore|disregard|forget)\s+(all\s+|any\s+)?(previous|prior|above|earlier)\s+(instructions?|prompts?|rules?|directives?)'
+  - id: system_impersonation
+    description: Pretending to speak as the system or developer
+    pattern: '\b(you\s+are\s+now|act\s+as\s+if\s+you\s+are|pretend\s+(that\s+)?you\s+are)\s+(the\s+)?(system|developer|admin|root|dan)\b'
+  - id: reveal_instructions
+    description: Asking the model to reveal its hidden instructions
+    pattern: '(reveal|show|print|repeat|output)\s+(your\s+|the\s+)?(system\s+prompt|hidden\s+(instructions?|prompt)|initial\s+instructions?)'
+  - id: jailbreak_marker
+    description: Common jailbreak persona markers
+    pattern: '\b(do\s+anything\s+now|developer\s+mode\s+enabled|jailbreak(ed)?\s+mode)\b'
+
+delimiter_patterns:
+  - id: fake_system_delimiter
+    description: Suspicious system/instruction delimiter blocks
+    pattern: '(\[/?(INST|SYS|SYSTEM)\]|<\|?(im_start|im_end|system|endoftext)\|?>|-{3,}\s*(SYSTEM|BEGIN\s+(NEW\s+)?INSTRUCTIONS?)\s*-{0,3})'
+  - id: chat_template_tokens
+    description: Raw chat-template control tokens
+    pattern: '(<\|assistant\|>|<\|user\|>|<<SYS>>|\[system\]\s*:)'
+
+secret_patterns:
+  - id: openai_key
+    description: OpenAI-style API key
+    pattern: '\bsk-[a-zA-Z0-9_-]{20,}\b'
+  - id: anthropic_key
+    description: Anthropic API key
+    pattern: '\bsk-ant-[a-zA-Z0-9_-]{20,}\b'
+  - id: aws_access_key
+    description: AWS access key id
+    pattern: '\bAKIA[0-9A-Z]{16}\b'
+  - id: github_token
+    description: GitHub personal access token
+    pattern: '\bgh[pousr]_[A-Za-z0-9]{36,}\b'
+  - id: private_key_block
+    description: PEM private key material
+    pattern: '-----BEGIN\s+(RSA\s+|EC\s+|OPENSSH\s+)?PRIVATE\s+KEY-----'

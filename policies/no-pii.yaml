@@ -1,0 +1,8 @@
+id: no-pii
+capabilities:
+  allowed: [web_search, kb_lookup]
+  blocked: [code_execution, file_write]
+topics:
+  blocked:
+    - id: competitors
+      keywords: [acme corp, globex]

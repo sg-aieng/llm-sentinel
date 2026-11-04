@@ -1,0 +1,10 @@
+# Optional static identities for the placeholder StaticIdentityProvider.
+# Copy to identities.yaml to use. In production, replace the provider with
+# one backed by your IAM — see app/identity.py.
+users:
+  user-42:
+    roles: [admin]
+  user-99:
+    roles: [guest]
+    attributes:
+      team: support

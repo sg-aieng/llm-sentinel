@@ -1,0 +1,25 @@
+# Example application policy. Filename or `id` = application_id.
+id: support-bot
+
+capabilities:
+  allowed: [web_search, kb_lookup]
+  blocked: [code_execution, file_write]   # explicit deny wins over allowed
+
+# Optional per-role capability overrides. Roles come from the
+# IdentityProvider (see app/identity.py). First matching role wins.
+roles:
+  admin:
+    capabilities:
+      allowed: [web_search, kb_lookup, code_execution]
+      blocked: [file_write]
+
+topics:
+  blocked:
+    - id: medical_advice
+      keywords: [diagnosis, prescription, dosage]
+    - id: competitors
+      keywords: [acme corp, globex]
+
+pii:
+  action: redact            # block | redact | flag
+  entities: [EMAIL, PHONE, SSN, CREDIT_CARD, PERSON, ADDRESS]

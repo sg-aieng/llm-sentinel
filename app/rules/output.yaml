@@ -1,0 +1,34 @@
+# Output rule pack — deterministic checks on the MODEL's response before
+# it is returned to the end user. Two threat classes:
+#   leak_patterns    — the model disclosing its own hidden instructions
+#   secret_patterns  — credentials/keys surfacing in the response
+# Same schema as rules/default.yaml; any category ending in _patterns
+# is loaded.
+
+leak_patterns:
+  - id: system_prompt_disclosure
+    description: Response paraphrasing or quoting its hidden instructions
+    pattern: '\b(my|the)\s+(system\s+prompt|hidden\s+(instructions?|prompt)|initial\s+instructions?)\s+(is|are|says?|reads?|states?)\b'
+  - id: instruction_recital
+    description: Response reciting an instruction preamble verbatim
+    pattern: '\b(i\s+(was|am)\s+(told|instructed|programmed)\s+(to|that)|here\s+(is|are)\s+(my|the)\s+(system\s+prompt|instructions))\b'
+  - id: chat_template_tokens
+    description: Raw chat-template control tokens leaking into output
+    pattern: '(<\|?(im_start|im_end|system|endoftext)\|?>|<\|assistant\|>|<\|user\|>|<<SYS>>|\[/?(INST|SYS)\])'
+
+secret_patterns:
+  - id: openai_key
+    description: OpenAI-style API key
+    pattern: '\bsk-[a-zA-Z0-9_-]{20,}\b'
+  - id: anthropic_key
+    description: Anthropic API key
+    pattern: '\bsk-ant-[a-zA-Z0-9_-]{20,}\b'
+  - id: aws_access_key
+    description: AWS access key id
+    pattern: '\bAKIA[0-9A-Z]{16}\b'
+  - id: github_token
+    description: GitHub personal access token
+    pattern: '\bgh[pousr]_[A-Za-z0-9]{36,}\b'
+  - id: private_key_block
+    description: PEM private key material
+    pattern: '-----BEGIN\s+(RSA\s+|EC\s+|OPENSSH\s+)?PRIVATE\s+KEY-----'
